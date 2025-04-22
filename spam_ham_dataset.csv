@@ -1,0 +1,6 @@
+Unnamed: 0,label,text,label_num
+0,ham,"Hey, are we still meeting for lunch?",0
+1,spam,"You won a free ticket! Claim now!",1
+2,ham,"Can you send me the report by tomorrow?",0
+3,spam,"Congratulations! You've been selected for a prize!",1
+4,ham,"Let's catch up later in the evening.",0

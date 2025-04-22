@@ -1,0 +1,484 @@
+# Integrate data from multiple sources by merging and transforming datasets using Python's pandas library and data manipulation techniques.
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Read the CSV files
+df1 = pd.read_csv('Student.csv')
+df2 = pd.read_csv('Marks.csv')
+
+# Show the first few rows
+print("Student Data:")
+print(df1.head())
+
+print("\nMarks Data:")
+print(df2.head())
+
+# Merge the dataframes on 'StudentID'
+df = pd.merge(df1, df2, on="StudentID")
+
+# Display merged dataframe
+print("\nMerged DataFrame:")
+print(df.head(10))
+
+# Sort by Marks
+sorted_df = df.sort_values(by=['Marks'])
+print("\nSorted by Marks:")
+print(sorted_df)
+
+# Filter specific columns
+filtered_df = df[['Class', 'Subject', 'Marks']]
+print("\nFiltered Columns (Class, Subject, Marks):")
+print(filtered_df)
+
+# Check for duplicates
+print("\nDuplicate Rows (True = duplicate):")
+print(df.duplicated())
+
+# Remove duplicates
+df_no_duplicates = df.drop_duplicates()
+print("\nData after removing duplicates:")
+print(df_no_duplicates)
+
+# Rename the 'Name' column to 'StudentName'
+df_renamed = df.rename(columns={'Name': 'StudentName'})
+print("\nDataFrame with Renamed Column:")
+print(df_renamed)
+
+______________________________________________________________________________________________
+
+#Apply feature selection techniques like variance thresholding and correlation analysis using python’s scikit-learn library to reduce dimensionality in a dataset.
+
+import numpy as np
+import pandas as pd
+
+from sklearn.linear_model import LassoCV
+from sklearn.feature_selection import SelectFromModel
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import RandomForestClassifier
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Load the breast cancer dataset
+cancer = load_breast_cancer()
+X, y = cancer.data, cancer.target
+
+X_train , X_test,y_train,y_test = train_test_split(X,y,test_size=0.2,random_state=42)
+
+#fit LassoCV model
+Lasso_cv = LassoCV(cv=5)
+Lasso_cv.fit(X_train,y_train)
+
+#feature selection
+
+sfm = SelectFromModel(Lasso_cv,prefit=True)
+X_train_selected = sfm.transform(X_train)
+X_test_selected = sfm.transform(X_test)
+
+#train a Random forest classifier using the selected feature 
+model = RandomForestClassifier(n_estimators=100,random_state=42)
+model.fit(X_train_selected,y_train)
+
+#evaluate the model 
+y_pred = model.predict = (X_test_selected)
+print(classification_report,(y_test,y_pred))
+
+selected_feature_indicies = np.where(sfm.get_support())[0]
+selected_feature = cancer.feature_names [selected_feature_indicies]
+coefficient = Lasso_cv.coef_
+print("Selected Feature :",selected_feature)
+print("Coefficient feature :",coefficient)
+
+_________________________________________________________________________________________________________
+
+#Build a decision tree classifier using python’s scikit learn library to predict customer churn based on historical data.
+
+
+import numpy as np
+import pandas as pd
+import seaborn as sns
+from sklearn.linear_model import LassoCV
+from sklearn.feature_selection import SelectFromModel
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
+from sklearn.datasets import load_breast_cancer
+from sklearn.ensemble import RandomForestClassifier
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('chrun.csv')
+print(df)
+df = df.dropna(['CustomerID','Age','Balance'],axis=1)
+print(df)
+
+_____________________________________________________________________________________________________
+
+
+Aim: Implement Naive Bayes classifier in python using scikit learn to classify emails as spam or non spam based on their content.
+
+import numpy as np
+import pandas as pd
+
+from sklearn.model_selection import train_test_split
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics import accuracy_score, classification_report
+
+# Load dataset
+data = pd.read_csv('spam_ham_dataset.csv', encoding="ISO-8859-1")
+print(data.head())
+
+# Check label distribution
+print("Label counts:\n", data["label"].value_counts())
+
+# Clean text column (optional trimming, here it's minimal)
+text = []
+for i in range(len(data)):
+    ln = data["text"][i]
+    line = ""
+    for ch in ln:
+        if ch == '\r':
+            break
+        line += ch
+    line = line.replace("v2", "")
+    text.append(line)
+data['text'] = text
+
+# Rename columns for clarity
+data.columns = ["id", "label", "text", "label_num"]
+print(data.head())
+
+# Split dataset
+x_train, x_test, y_train, y_test = train_test_split(data['text'], data['label'], test_size=0.3, random_state=42)
+
+# Vectorize text
+vectorizer = CountVectorizer()
+x_train_vec = vectorizer.fit_transform(x_train)
+x_test_vec = vectorizer.transform(x_test)
+
+# Train Naive Bayes model
+model = MultinomialNB()
+model.fit(x_train_vec, y_train)
+
+# Predict
+y_pred = model.predict(x_test_vec)
+
+# Evaluate
+print("\nAccuracy:", accuracy_score(y_test, y_pred))
+print("\nClassification Report:\n", classification_report(y_test, y_pred, zero_division=1))
+
+
+
+_________________________________________________________________________________________________
+
+Aim: Implement a linear regression method to make predictions based on the sample data set using python.
+import numpy as np
+import pandas as pd
+from scipy import stats
+
+# Load the dataset
+data = pd.read_csv('data.csv')
+print("Dataset:\n", data)
+
+# Assign 'tcs' as the independent variable (X)
+x = data['tcs']
+
+# Assign 'wipro' as the dependent variable (Y)
+y = data['wipro']
+
+# Perform linear regression using scipy's linregress
+n = stats.linregress(x, y)
+print("\nLinear Regression Output:\n", n)
+
+# Extract slope (m) from the regression result
+s = n.slope
+print("\nSlope (m):", s)
+
+# Extract intercept (c) from the regression result
+i = n.intercept
+print("Intercept (c):", i)
+
+# Use the regression line equation: y = mx + c to make predictions
+pred_y = s * x + i
+print("\nPredicted 'wipro' values:\n", pred_y)
+
+# Calculate R-squared value (coefficient of correlation)
+r_squared = n.rvalue
+print("\nR-squared (correlation coefficient):", r_squared)
+
+________________________________________________________________________________________________
+
+
+Aim: Implement logistic regression method to make prediction based on the sample data set using python.
+
+
+
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import StandardScaler
+
+# Load the Iris dataset
+data = pd.read_csv('iris.csv')
+print(data.head())
+print(data.columns)
+# Display basic info about the dataset
+print("\nDataset Info:")
+print(data.info())
+
+# Display summary statistics
+print("\nSummary Statistics:")
+print(data.describe())
+
+# Encode the 'Species' column as numeric values (0, 1, 2)
+label_encoder = LabelEncoder()
+data['variety'] = label_encoder.fit_transform(data['variety'])
+
+
+# Define the features (X) and target variable (Y)
+X = data[['sepal.length', 'sepal.width', 'petal.length', 'petal.width']]
+
+Y = data['variety']
+
+# Split the dataset into training and testing sets
+X_train, X_test, Y_train, Y_test = train_test_split(X, Y, test_size=0.30, random_state=0)
+
+# Feature scaling for better model performance (especially for Logistic Regression)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Create and train the Logistic Regression model
+model = LogisticRegression(max_iter=200)
+model.fit(X_train, Y_train)
+
+# Make predictions
+prediction = model.predict(X_test)
+
+# Evaluate the model accuracy
+accuracy = accuracy_score(Y_test, prediction)
+print("\nAccuracy of Logistic Regression model:", accuracy)
+
+# Optionally, display the predictions
+print("\nPredictions:", prediction)
+
+_______________________________________________________________________________________________
+
+Aim: Implement K-means clustering algorithm in python using scikit learn to group customers based on their purchasing behaviour.
+
+
+import pandas as pd
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from matplotlib import pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
+
+# Load the dataset
+data = pd.read_csv('online-retail-dataset.csv')
+print(data.head())
+print(data.describe())
+
+# Drop missing values
+data.dropna(inplace=True)
+
+# Fix column name typo
+data.columns = data.columns.str.strip()  # clean whitespace
+# Fixing 'UnitPrice' typo
+data['Total_Amount'] = data['Quantity'] * data['UnitPrice']
+
+# --- MONETARY ---
+m = data.groupby('CustomerID')['Total_Amount'].sum().reset_index()
+
+# --- FREQUENCY ---
+f = data.groupby('CustomerID')['InvoiceNo'].nunique().reset_index()
+f.columns = ['CustomerID', 'Frequency']
+
+# --- RECENCY ---
+data['InvoiceDate'] = pd.to_datetime(data['InvoiceDate'], format='%m/%d/%Y %H:%M')
+last_day = data['InvoiceDate'].max()
+data['difference'] = (last_day - data['InvoiceDate']).dt.days
+r = data.groupby('CustomerID')['difference'].min().reset_index()
+r.columns = ['CustomerID', 'Recency']
+
+# Combine RFM features
+grouped_fd = pd.merge(m, f, on='CustomerID', how='inner')
+RFM_df = pd.merge(grouped_fd, r, on='CustomerID', how='inner')
+RFM_df.columns = ['CustomerID', 'Monetary', 'Frequency', 'Recency']
+
+# --- OUTLIER REMOVAL ---
+outlier_vars = ['Monetary', 'Recency', 'Frequency']
+for column in outlier_vars:
+    Q1 = RFM_df[column].quantile(0.25)
+    Q3 = RFM_df[column].quantile(0.75)
+    IQR = Q3 - Q1
+    lower = Q1 - 1.5 * IQR
+    upper = Q3 + 1.5 * IQR
+    outliers = RFM_df[(RFM_df[column] < lower) | (RFM_df[column] > upper)].index
+    print(f"{len(outliers)} Outliers detected in column {column}")
+    RFM_df.drop(outliers, inplace=True)
+
+# --- SCALING ---
+scaled_df = RFM_df[['Monetary', 'Frequency', 'Recency']]
+scaler = StandardScaler()
+RFM_df_scaled = scaler.fit_transform(scaled_df)
+RFM_df_scaled = pd.DataFrame(RFM_df_scaled, columns=['Monetary', 'Frequency', 'Recency'])
+
+# --- KMeans Clustering (fixed warning by setting n_init) ---
+kmeans = KMeans(n_clusters=3, n_init=10)
+kmeans.fit(RFM_df_scaled)
+RFM_df['labels'] = kmeans.labels_
+
+# --- 3D VISUALIZATION ---
+fig = plt.figure(figsize=(21, 10))
+ax = fig.add_subplot(111, projection='3d')
+
+for label in range(3):
+    ax.scatter(RFM_df['Monetary'][RFM_df['labels'] == label],
+               RFM_df['Frequency'][RFM_df['labels'] == label],
+               RFM_df['Recency'][RFM_df['labels'] == label],
+               label=f'Cluster {label}')
+
+ax.set_xlabel('Monetary')
+ax.set_ylabel('Frequency')
+ax.set_zlabel('Recency')
+ax.view_init(30, 185)
+plt.legend()
+plt.show()
+# Boxplot for Monetary
+plt.figure(figsize=(8, 5))
+plt.boxplot(RFM_df['Monetary'], vert=False)
+plt.title('Boxplot of Monetary Values')
+plt.xlabel('Monetary')
+plt.grid(True)
+plt.show()
+
+
+_________________________________________________________________________________________________________
+
+Aim: Implement the Apriori algorithm in Python to mine frequent itemset from a retail transaction dataset and extract association rules.
+
+
+#Aim: Implement the Apriori algorithm in Python to mine frequent itemset from a retail transaction dataset and extract association rules.
+
+import numpy as np
+import pandas as pd
+from mlxtend.frequent_patterns import apriori , association_rules
+
+data = pd.read_csv('online-retail-datasets.csv')
+print(data)
+
+data.Country.unique()
+
+# Cleaning the data
+data['Description'] = data['Description'].str.strip()
+data.dropna(axis=0, subset=['InvoiceNo'], inplace=True)
+data['InvoiceNo'] = data['InvoiceNo'].astype('str')
+data = data[~data['InvoiceNo'].str.contains('C')]
+
+# Grouping data by country and preparing baskets
+basket_France = (data[data['Country'] == "France"]
+    .groupby(['InvoiceNo', 'Description'])['Quantity']
+    .sum().unstack().reset_index().fillna(0)
+    .set_index('InvoiceNo'))
+
+basket_UK = (data[data['Country'] == "United Kingdom"]
+    .groupby(['InvoiceNo', 'Description'])['Quantity']
+    .sum().unstack().reset_index().fillna(0)
+    .set_index('InvoiceNo'))
+
+basket_Por = (data[data['Country'] == "Portugal"]
+    .groupby(['InvoiceNo', 'Description'])['Quantity']
+    .sum().unstack().reset_index().fillna(0)
+    .set_index('InvoiceNo'))
+
+basket_Sweden = (data[data['Country'] == "Sweden"]
+    .groupby(['InvoiceNo', 'Description'])['Quantity']
+    .sum().unstack().reset_index().fillna(0)
+    .set_index('InvoiceNo'))
+def hot_encode(X):  # Use the correct argument name here
+    if X <= 0:       # Access the argument using X
+        return 0
+    if X >= 1:       # Access the argument using X
+        return 1
+
+basket_encoded = basket_France.applymap(hot_encode)
+basket_France = basket_encoded
+
+basket_encoded = basket_UK.applymap(hot_encode)
+basket_UK = basket_encoded
+
+basket_encoded = basket_Por.applymap(hot_encode)
+basket_Por = basket_encoded
+
+basket_encoded = basket_Sweden.applymap(hot_encode)
+basket_Sweden = basket_encoded
+frq_items = apriori(basket_France, min_support = 0.05, use_colnames = True)
+rules = association_rules(frq_items, metric = "lift", min_threshold = 1)
+rules = rules.sort_values(['confidence', 'lift'], ascending = [False, False])
+print(rules.head())
+
+
+
+
+################################################################################################3
+
+# Aim: Implement the Apriori algorithm in Python to mine frequent itemsets 
+# from a retail transaction dataset and extract association rules.
+
+import numpy as np
+import pandas as pd
+from mlxtend.frequent_patterns import apriori, association_rules
+
+# Load dataset
+data = pd.read_csv('online-retail-datasets.csv')
+print(data.head())
+
+# Show unique countries
+print(data['Country'].unique())
+
+# ----------------------- Data Cleaning -----------------------
+# Strip leading/trailing whitespaces from product descriptions
+data['Description'] = data['Description'].str.strip()
+
+# Drop rows with missing InvoiceNo
+data.dropna(subset=['InvoiceNo'], inplace=True)
+
+# Convert InvoiceNo to string and remove credit transactions (those containing 'C')
+data['InvoiceNo'] = data['InvoiceNo'].astype(str)
+data = data[~data['InvoiceNo'].str.contains('C')]
+
+# ------------------ Helper Function for Encoding ------------------
+def hot_encode(x):
+    return 0 if x <= 0 else 1
+
+# ----------------------- Country-wise Baskets -----------------------
+def create_basket(data, country):
+    basket = (data[data['Country'] == country]
+              .groupby(['InvoiceNo', 'Description'])['Quantity']
+              .sum().unstack().reset_index().fillna(0)
+              .set_index('InvoiceNo'))
+    basket = basket.applymap(hot_encode)
+    basket = basket.astype(bool)  # Fix deprecation warning
+    return basket
+
+basket_France = create_basket(data, 'France')
+basket_UK = create_basket(data, 'United Kingdom')
+basket_Por = create_basket(data, 'Portugal')
+basket_Sweden = create_basket(data, 'Sweden')
+
+# -------------------- Apply Apriori and Association Rules --------------------
+# Example: France
+frq_items = apriori(basket_France, min_support=0.05, use_colnames=True)
+
+# Generate rules
+rules = association_rules(frq_items, metric='lift', min_threshold=1)
+
+# Sort rules by confidence and lift
+rules = rules.sort_values(['confidence', 'lift'], ascending=[False, False])
+
+# Display top 5 rules
+print(rules.head())
